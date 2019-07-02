@@ -1,0 +1,22 @@
+{
+	"name": "sqlprueba",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SqlServerClippersSource",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"TableName": {
+				"type": "string",
+				"defaultValue": "prueba"
+			}
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [],
+		"typeProperties": {
+			"tableName": "[dbo].[prueba]"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

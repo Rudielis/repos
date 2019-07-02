@@ -1,0 +1,64 @@
+{
+	"name": "Tweets",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SqlServerClippersSource",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "UserName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "TweetText",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Description",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Location",
+				"type": "nvarchar"
+			},
+			{
+				"name": "RetweetCount",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "TweetedBy",
+				"type": "varchar"
+			},
+			{
+				"name": "SentimentScore",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Followers",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CreatedAt",
+				"type": "nvarchar"
+			},
+			{
+				"name": "TweetID",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"tableName": "[dbo].[Tweets]"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
