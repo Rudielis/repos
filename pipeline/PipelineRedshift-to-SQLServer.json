@@ -360,7 +360,6 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"storedProcedureName": "[load].[sp_UpdateWatermak]",
 								"storedProcedureParameters": {
 									"id": {
 										"value": {
@@ -379,7 +378,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": "ClippersRedShiftASQLServer",
+								"referenceName": "SqlServer1",
 								"type": "LinkedServiceReference"
 							}
 						}
