@@ -1,9 +1,11 @@
 {
-	"name": "PipelineDia27AWSaSQL",
+	"name": "PipelineRedshift-to-SQLServer",
 	"properties": {
+		"description": "Pipeline designed to incremental load using Watermark Columns from Amazon Web Services RedShift to SQLServer.",
 		"activities": [
 			{
-				"name": "GETCFG",
+				"name": "GetCfgTable",
+				"description": "We get the configuration table which allow us to find the names of the tables and columns of the DB to perform the copy activity a few steps ahead.",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -33,11 +35,12 @@
 				}
 			},
 			{
-				"name": "AWS REDSHIFT CFG",
+				"name": "SourceFilterAWS",
+				"description": "In this activity we filter the tables containing 'AWS' in Source Name which allow us to identify the tables having a Watermark Column.",
 				"type": "Filter",
 				"dependsOn": [
 					{
-						"activity": "GETCFG",
+						"activity": "GetCfgTable",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -46,7 +49,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('GETCFG').output.value",
+						"value": "@activity('GetCfgTable').output.value",
 						"type": "Expression"
 					},
 					"condition": {
@@ -57,10 +60,11 @@
 			},
 			{
 				"name": "For Each RedShiftaSQL",
+				"description": "We get the tables allowing us to iterate over the filter from our previous activity.",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "AWS REDSHIFT CFG",
+						"activity": "SourceFilterAWS",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -69,7 +73,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('AWS REDSHIFT CFG').output.value",
+						"value": "@activity('SourceFilterAWS').output.value",
 						"type": "Expression"
 					},
 					"activities": [
@@ -234,11 +238,12 @@
 				}
 			},
 			{
-				"name": "FilterTableNotDate",
+				"name": "SourceFilterNotDate",
+				"description": "In this activity we filter the tables containing 'Not Date' in Source Name which allow us to identify the tables not having a Watermark Column.",
 				"type": "Filter",
 				"dependsOn": [
 					{
-						"activity": "GETCFG",
+						"activity": "GetCfgTable",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -247,7 +252,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('GETCFG').output.value",
+						"value": "@activity('GetCfgTable').output.value",
 						"type": "Expression"
 					},
 					"condition": {
@@ -261,7 +266,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "FilterTableNotDate",
+						"activity": "SourceFilterNotDate",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -270,7 +275,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('FilterTableNotDate').output.value",
+						"value": "@activity('SourceFilterNotDate').output.value",
 						"type": "Expression"
 					},
 					"activities": [
