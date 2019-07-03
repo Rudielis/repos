@@ -286,6 +286,7 @@
 					"activities": [
 						{
 							"name": "CopyTableNotDate",
+							"description": "We extract data from tables that do not have Amazon Redshift date to sql server",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
@@ -340,6 +341,7 @@
 						},
 						{
 							"name": "SqlSPWaterMarkValueNotDAte",
+							"description": "This procedure updates the watermark value date of the sql server tables, but does not update the column because it does not have a date column. It is only to have a reference of when was the last update of the table",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
