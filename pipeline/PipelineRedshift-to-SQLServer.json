@@ -4,7 +4,7 @@
 		"description": "Pipeline designed to incremental load using Watermark Columns from Amazon Web Services RedShift to SQLServer.",
 		"activities": [
 			{
-				"name": "GetConfigTable",
+				"name": "GetCfgTable",
 				"description": "We get the configuration table which allow us to find the names of the tables and columns of the DB to perform the copy activity a few steps ahead.",
 				"type": "Lookup",
 				"dependsOn": [],
@@ -40,7 +40,7 @@
 				"type": "Filter",
 				"dependsOn": [
 					{
-						"activity": "GetConfigTable",
+						"activity": "GetCfgTable",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -49,7 +49,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('GetConfigTable').output.value",
+						"value": "@activity('GetCfgTable').output.value",
 						"type": "Expression"
 					},
 					"condition": {
@@ -59,8 +59,8 @@
 				}
 			},
 			{
-				"name": "For Each RedShiftaSQL",
-				"description": "We get the tables allowing us to iterate over the filter from our previous activity.",
+				"name": "ForEachAWS",
+				"description": "We get the tables filtered by our previous activity ('AWS') and now we can iterate in each one of them.",
 				"type": "ForEach",
 				"dependsOn": [
 					{
@@ -78,7 +78,8 @@
 					},
 					"activities": [
 						{
-							"name": "GETMAXAWS",
+							"name": "GetMaxDate",
+							"description": "For each table we get the max date in the watermark column.",
 							"type": "Lookup",
 							"dependsOn": [],
 							"policy": {
@@ -111,11 +112,12 @@
 							}
 						},
 						{
-							"name": "Copy From AWS",
+							"name": "Copy-AmazonRedShift-to-SQLServer",
+							"description": "This is the main activity in which we copy the data from Amazon RedShift to SQL Server; taking consideration the Watermark Columns and its values.",
 							"type": "Copy",
 							"dependsOn": [
 								{
-									"activity": "VariableFecha",
+									"activity": "VariableDate",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -172,11 +174,12 @@
 							]
 						},
 						{
-							"name": "SP UPDATE WATERMARK AWS",
+							"name": "SP-UpdateWaterMark-AWS",
+							"description": "In this last step of the For Each we update our table configuration Watermark values for take consideration in future incremental loads.",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "Copy From AWS",
+									"activity": "Copy-AmazonRedShift-to-SQLServer",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -215,11 +218,12 @@
 							}
 						},
 						{
-							"name": "VariableFecha",
+							"name": "VariableDate",
+							"description": "We save in a variable the date we were looking in the previous activity,",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "GETMAXAWS",
+									"activity": "GetMaxDate",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -229,7 +233,7 @@
 							"typeProperties": {
 								"variableName": "varLaClippers",
 								"value": {
-									"value": "@coalesce(activity('GETMAXAWS').output?.firstRow?.MAXD,formatDateTime(utcnow()))",
+									"value": "@coalesce(activity('GetMaxDate').output?.firstRow?.MAXD,formatDateTime(utcnow()))",
 									"type": "Expression"
 								}
 							}
@@ -243,7 +247,7 @@
 				"type": "Filter",
 				"dependsOn": [
 					{
-						"activity": "GetConfigTable",
+						"activity": "GetCfgTable",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -252,7 +256,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('GetConfigTable').output.value",
+						"value": "@activity('GetCfgTable').output.value",
 						"type": "Expression"
 					},
 					"condition": {
@@ -262,8 +266,8 @@
 				}
 			},
 			{
-				"name": "ForEachTableNotDate",
-				"description": "We get the tables allowing us to iterate over the filter from our previous activity.",
+				"name": "ForEachNotDate",
+				"description": "We get the tables filtered by our previous activity ('AWS') and now we can iterate in each one of them.",
 				"type": "ForEach",
 				"dependsOn": [
 					{
@@ -282,7 +286,6 @@
 					"activities": [
 						{
 							"name": "CopyTableNotDate",
-							"description": "We extract data from tables that have no date, from Amazon Redshift to sql server",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
@@ -337,7 +340,6 @@
 						},
 						{
 							"name": "SqlSPWaterMarkValueNotDAte",
-							"description": "This procedure updates the watermark value date of the sql server tables, but does not update the column because it does not have a date column. It is only to have a reference of when was the last update of the table",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
