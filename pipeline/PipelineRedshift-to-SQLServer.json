@@ -59,8 +59,8 @@
 				}
 			},
 			{
-				"name": "For Each RedShiftaSQL",
-				"description": "We get the tables allowing us to iterate over the filter from our previous activity.",
+				"name": "ForEachAWS",
+				"description": "We get the tables filtered by our previous activity ('AWS') and now we can iterate in each one of them.",
 				"type": "ForEach",
 				"dependsOn": [
 					{
@@ -262,7 +262,8 @@
 				}
 			},
 			{
-				"name": "ForEachTableNotDate",
+				"name": "ForEachNotDate",
+				"description": "We get the tables filtered by our previous activity ('AWS') and now we can iterate in each one of them.",
 				"type": "ForEach",
 				"dependsOn": [
 					{
